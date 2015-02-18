@@ -13,9 +13,12 @@ class Perceptron(Clasificador):
 		self.columnas = []
 		self.nColumnas = 0
 		self.nClases = 0
-		self.alpha = 0.05
+		self.alpha = 0.001
 		self.nEpocas = 500
 		self.umbral = 0
+		self.debug = False
+		self.debugFileName = "debugPerceptron.txt"
+		self.debugFile = None
 
 		self.pesosByNeuronaSalida = {}
 		self.neuronasEntrada = []
@@ -50,6 +53,7 @@ class Perceptron(Clasificador):
 		instancias = data.getListInstances()
 		for epoca in range(0, self.nEpocas):
 			flagPesos = False
+			n_errores = 0
 			for instancia in instancias:
 				#Establecer las activaciones a las neuronas de entrada
 				for indNeurona in range(1, self.nColumnas + 1):
@@ -70,14 +74,22 @@ class Perceptron(Clasificador):
 
 				vectorObjetivo = vectoresObjetivos[instancia]
 				
+				flagPesos_aux = False
 				for j in range(0, self.nClases):
 					if yIn[j] != vectorObjetivo[j]:
-						#hago cosas
+						#error de clasificacion en la neurona de salida
 						flagPesos = True
+						flagPesos_aux =True
 						auxDeltaPesos = self.alpha * vectorObjetivo[j]
 						for indNE in range(0, self.nColumnas + 1):
 							self.pesosByNeuronaSalida[self.clases[j]][indNE] += (auxDeltaPesos * self.neuronasEntrada[indNE])
+				
+				if flagPesos_aux == True:
+					#ha habido un error de clasificacion en ese elemento
+					n_errores += 1
 
+			if self.debug == True:
+				self.debugFile.write(str(epoca) + '\t' + str(n_errores) + '\n')
 
 			if flagPesos == False:
 				break
@@ -135,4 +147,9 @@ class Perceptron(Clasificador):
 	def getCapabilities(self):
 		raise NotImplementedError( "Should have implemented this" )
 	
+	"""Hace que el clasificador entre en modo debug o no"""
+	def setDebug(self, value):
+		self.debug = value
+		if self.debug == True:
+			self.debugFile = open(self.debugFileName, 'w')
 		

@@ -13,9 +13,8 @@ class Adaline(Clasificador):
 		self.columnas = []
 		self.nColumnas = 0
 		self.nClases = 0
-		self.alpha = 0.0001
+		self.alpha = 0.1
 		self.nEpocas = 1000
-		self.umbral = 0
 		self.debug = False
 		self.debugFileName = "debugAdaline.txt"
 		self.debugFile = None
@@ -67,15 +66,6 @@ class Adaline(Clasificador):
 				for clase in self.clases:
 					yIn.append(reduce(lambda x, y: x + y, [x * b for (x, b) in zip(self.neuronasEntrada, self.pesosByNeuronaSalida[clase])]))
 
-				"""
-				for i in range(0, self.nClases):
-					if yIn[i] > self.umbral:
-						yIn[i] = 1
-					elif yIn[i] < -self.umbral:
-						yIn[i] = -1
-					else:
-						yIn[i] = 0
-				"""
 
 				vectorObjetivo = vectoresObjetivos[instancia]
 				
@@ -97,7 +87,7 @@ class Adaline(Clasificador):
 
 				self.errorCuadraticoMedio_old = self.errorCuadraticoMedio
 			else:
-				difErrCuadratico = (self.errorCuadraticoMedio - self.errorCuadraticoMedio_old)/self.errorCuadraticoMedio_old
+				difErrCuadratico = abs((self.errorCuadraticoMedio - self.errorCuadraticoMedio_old)/self.errorCuadraticoMedio_old)
 				if difErrCuadratico < 0.00000001:
 					return
 

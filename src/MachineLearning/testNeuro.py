@@ -43,9 +43,9 @@ if __name__ == '__main__':
 	lector = LectorNeuro()
 	instances = lector.leerFichero('problema_real1.txt');
 	
-
+	porcentajeParticionado = 1.0
 	particionado = DivisionPorcentual()
-	particionado.setPortcentajeTrain(0.66)
+	particionado.setPortcentajeTrain(porcentajeParticionado)
 	particion = particionado.generaParticionesProporcional(instances)
 	
 	print "Adaline"
@@ -54,17 +54,19 @@ if __name__ == '__main__':
 	clasificador.buildClassifier(particion.getTrain())
 	print "Error TRAIN:"
 	calculaError(clasificador, particion.getTrain())
-	print "Error TEST:"
-	calculaError(clasificador, particion.getTest())
+	if porcentajeParticionado != 1.0:
+		print "Error TEST:"
+		calculaError(clasificador, particion.getTest())
 	
 	print "Perceptron"
 	clasificador = Perceptron()
+	clasificador.setDebug(True)
 	clasificador.buildClassifier(particion.getTrain())
 	print "Error TRAIN:"
 	calculaError(clasificador, particion.getTrain())
-	print "Error TEST:"
-	calculaError(clasificador, particion.getTest())
-
+	if porcentajeParticionado != 1.0:
+		print "Error TEST:"
+		calculaError(clasificador, particion.getTest())
 
 	#print clasificador.classifyInstance(instances.getListInstances()[4])
 	#print (instances.getListInstances()[4]).getClase()
