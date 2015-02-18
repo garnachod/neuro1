@@ -45,6 +45,7 @@ class DivisionPorcentual(Particionado):
 			instanceTest.addInstance(listInstances[i])
 
 		#añadir a la particion las instancias
+
 		particion.setTrain(instanceTrain)
 		particion.setTest(instanceTest)
 
@@ -111,6 +112,8 @@ class DivisionPorcentual(Particionado):
 		#	instanceTest.addInstance(listInstances[i])
 
 		#añadir a la particion las instancias
+
+		instanceTrain.shuffle()
 		particion.setTrain(instanceTrain)
 		particion.setTest(instanceTest)
 

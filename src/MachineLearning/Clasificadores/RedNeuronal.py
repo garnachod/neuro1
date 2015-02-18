@@ -19,7 +19,7 @@ class RedNeuronal(Clasificador):
 		self.pesosCapaOculta = []
 		self.pesosCapaSalida = []
 		self.neuronasCapaOculta = 20
-		self.nEpocas = 500
+		self.nEpocas = 300
 		self.alpha = 0.1
 
 	"""parametros es un string de configuracion para el clasificador"""
@@ -76,7 +76,10 @@ class RedNeuronal(Clasificador):
 					for indNeuronaEntr in range(0, self.nColumnas + 1):
 						suma += (self.pesosCapaOculta[indNeurona][indNeuronaEntr] * self.capaEntrada[indNeuronaEntr])
 					#aplicamos la sigmoidal a la suma, esto nos da la salida de la neurona
+					#f1 
 					salidaCapaOculta.append(1.0/(1.0 + math.exp( - suma)))
+					#f2
+					#salidaCapaOculta.append((2.0/(1.0 + math.exp( - suma))) - 1.0)
 
 				#paso 5, calculamos las respuestas de las neuronas de la capa de salida, vector Y
 				salidaFinal = []
@@ -85,7 +88,10 @@ class RedNeuronal(Clasificador):
 					for indNeuronaOculta in range(0, self.neuronasCapaOculta + 1):
 						suma += (self.pesosCapaSalida[indNeurona][indNeuronaOculta] * salidaCapaOculta[indNeuronaOculta])
 					#aplicamos la sigmoidal a la suma, esto nos da la salida de la neurona
+					#f1
 					salidaFinal.append(1.0/(1.0 + float(math.exp( - suma))))
+					#f2
+					#salidaFinal.append((2.0/(1.0 + math.exp( - suma))) - 1.0)
 				#***********fin de Feedforward **********************************
 				#***********inicio Retropropagación del error *******************
 				#paso 6
@@ -93,7 +99,10 @@ class RedNeuronal(Clasificador):
 				restaVOSalida = self.restaVectores(vectorObjetivo, salidaFinal)
 				deltaMinusculaK = []
 				for indNeuronaSalida in range(0, self.nClases):
+					#Tk - Yk * f1`(Yin)
 					deltaMinusculaK.append(restaVOSalida[indNeuronaSalida] * (salidaFinal[indNeuronaSalida] * (1.0 - salidaFinal[indNeuronaSalida])))
+					#Tk - Yk * f2`(Yin)
+					#deltaMinusculaK.append(restaVOSalida[indNeuronaSalida] * (0.5 * (1.0 + salidaFinal[indNeuronaSalida]) * (1.0 - salidaFinal[indNeuronaSalida])))
 				
 				deltaMayusculaJK = []
 				for indNeuronaSalida in range(0, self.nClases):
@@ -111,8 +120,10 @@ class RedNeuronal(Clasificador):
 					suma = 0
 					for indNeurona in range(0, self.nClases):
 						suma += self.pesosCapaSalida[indNeurona][indNeuronaOculta] * deltaMinusculaK[indNeurona]
-
+					#f`1
 					deltaMinusculaJ.append(suma*(salidaCapaOculta[indNeuronaOculta] * (1 - salidaCapaOculta[indNeuronaOculta])))
+					#f`2
+					#deltaMinusculaJ.append(suma*( 0.5 *(1.0 +salidaCapaOculta[indNeuronaOculta]) * (1.0 - salidaCapaOculta[indNeuronaOculta])))
 				
 				deltaMayusculaIJ = []
 				for indNeuronaOculta  in range(0, self.neuronasCapaOculta):
@@ -190,11 +201,14 @@ class RedNeuronal(Clasificador):
 			salidaFinal.append(1.0/(1.0 + math.exp( - suma)))
 		#***********fin de Feedforward **********************************
 		#print salidaFinal
+		mejorClase = None
+		mejorProb = -1.0
 		for i in range(0, self.nClases):
-			if salidaFinal[i] >= 0.500:
-				return self.clases[i]
+			if salidaFinal[i] > mejorProb:
+				mejorClase = self.clases[i]
+				mejorProb = salidaFinal[i]
 
-		return self.clases[0]
+		return mejorClase
 
 
 	"""retorna un String JSON para que el Clasificador se pueda guardar en un fichero o donde sea necesario"""

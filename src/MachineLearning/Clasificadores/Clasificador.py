@@ -27,3 +27,8 @@ class Clasificador(object):
 	"""retorna un string con el funcionamiento del Clasificador"""
 	def getCapabilities(self):
 		raise NotImplementedError( "Should have implemented this" )
+
+	"""Hace que el clasificador entre en modo debug o no"""
+	def setDebug(self, value):
+		raise NotImplementedError( "Should have implemented this" )
+

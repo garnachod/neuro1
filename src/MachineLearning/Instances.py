@@ -1,3 +1,4 @@
+import random
 class Instances(object):
 	"""docstring for Instances"""
 	def __init__(self):
@@ -48,3 +49,6 @@ class Instances(object):
 
 	def getTipoColumnaByNombre(self, nombre):
 		return self.columnaTipo[nombre]
+
+	def shuffle(self):
+		random.shuffle(self.instances)

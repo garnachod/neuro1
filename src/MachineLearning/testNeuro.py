@@ -1,14 +1,42 @@
+# -*- coding: utf-8 -*-
 import os, sys
 lib_path = os.path.abspath('../')
 sys.path.append(lib_path)
 from Clasificadores.NaiveBayes import NaiveBayes
 from Clasificadores.Perceptron import Perceptron
+from Clasificadores.Adaline import Adaline
 from Clasificadores.RedNeuronal import RedNeuronal
 from Particionado.DivisionPorcentual import DivisionPorcentual
 from Particionado.Particion import Particion
 from RW.LectorNeuro import LectorNeuro
 from Instance import Instance
 from Instances import Instances
+
+
+def calculaError(clasificador, instances):
+	error = 0.0
+	erroresPorClase = {}
+	aciertosPorClase = {}
+	for clase in instances.getClases():
+		erroresPorClase[clase] = 0
+		aciertosPorClase[clase] = 0
+
+	for instance in instances.getListInstances():
+		clase = instance.getClase()
+		prediccion = clasificador.classifyInstance(instance)
+		#print "clase: " + str(clase) + " prediccion: " + str(prediccion)
+
+		if prediccion != clase:
+			erroresPorClase[clase] += 1
+			error += 1.0
+		else:
+			aciertosPorClase[clase] += 1 
+
+	procentajeError = error / float(instances.getNumeroInstances())
+	print 'Error medio: ' + str(procentajeError)
+	for clase in instances.getClases():
+		sumaAux = float(erroresPorClase[clase] + aciertosPorClase[clase])
+		print '\t'+ clase + ': ' + str(erroresPorClase[clase]) + ' aciertos: ' + str(aciertosPorClase[clase]) + ' porcentaje: ' + str(erroresPorClase[clase] / sumaAux)
 
 """pruebas unitarias"""
 if __name__ == '__main__':
@@ -19,31 +47,25 @@ if __name__ == '__main__':
 	particionado = DivisionPorcentual()
 	particionado.setPortcentajeTrain(0.66)
 	particion = particionado.generaParticionesProporcional(instances)
-
-
-	#clasificador = Perceptron()
-	clasificador = RedNeuronal()
+	
+	print "Adaline"
+	clasificador = Adaline()
+	clasificador.setDebug(True)
 	clasificador.buildClassifier(particion.getTrain())
+	print "Error TRAIN:"
+	calculaError(clasificador, particion.getTrain())
+	print "Error TEST:"
+	calculaError(clasificador, particion.getTest())
+	
+	print "Perceptron"
+	clasificador = Perceptron()
+	clasificador.buildClassifier(particion.getTrain())
+	print "Error TRAIN:"
+	calculaError(clasificador, particion.getTrain())
+	print "Error TEST:"
+	calculaError(clasificador, particion.getTest())
 
-	error = 0
-	erroresPorClase = {}
-	aciertosPorClase = {}
-	for clase in instances.getClases():
-		erroresPorClase[clase] = 0
-		aciertosPorClase[clase] = 0
-
-	for instance in particion.getTest().getListInstances():
-		clase = instance.getClase()
-		if clasificador.classifyInstance(instance) != clase:
-			erroresPorClase[clase] += 1
-			error += 1
-		else:
-			aciertosPorClase[clase] += 1 
-
-	procentajeError = error / float(particion.getTest().getNumeroInstances())
-	print 'Error: ' + str(procentajeError)
-	for clase in instances.getClases():
-		print 'Error '+ clase + ': ' + str(erroresPorClase[clase]) + ' aciertos: ' + str(aciertosPorClase[clase])
 
 	#print clasificador.classifyInstance(instances.getListInstances()[4])
 	#print (instances.getListInstances()[4]).getClase()
+

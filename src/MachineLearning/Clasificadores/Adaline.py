@@ -5,17 +5,22 @@ from Clasificador import Clasificador
 import random
 import math   # This will import math module
 
-class Perceptron(Clasificador):
-	"""docstring for Perceptron"""
+class Adaline(Clasificador):
+	"""docstring for Adaline"""
 	def __init__(self):
-		super(Perceptron, self).__init__()
+		super(Adaline, self).__init__()
 		self.clases = []
 		self.columnas = []
 		self.nColumnas = 0
 		self.nClases = 0
-		self.alpha = 0.05
-		self.nEpocas = 500
+		self.alpha = 0.0001
+		self.nEpocas = 1000
 		self.umbral = 0
+		self.debug = False
+		self.debugFileName = "debugAdaline.txt"
+		self.debugFile = None
+		self.errorCuadraticoMedio = 0
+		self.errorCuadraticoMedio_old = 0.00000001
 
 		self.pesosByNeuronaSalida = {}
 		self.neuronasEntrada = []
@@ -32,6 +37,7 @@ class Perceptron(Clasificador):
 		self.columnas = list(data.getColumnasList())
 		self.nClases = len(self.clases)
 		self.nColumnas = len(self.columnas)
+		self.nInstaces = data.getNumeroInstances()
 
 		#iniciar los pesos a valores aleatorios entre -0.5 y 0.5
 		for clase in self.clases:
@@ -50,6 +56,7 @@ class Perceptron(Clasificador):
 		instancias = data.getListInstances()
 		for epoca in range(0, self.nEpocas):
 			flagPesos = False
+			self.errorCuadraticoMedio = 0
 			for instancia in instancias:
 				#Establecer las activaciones a las neuronas de entrada
 				for indNeurona in range(1, self.nColumnas + 1):
@@ -60,6 +67,7 @@ class Perceptron(Clasificador):
 				for clase in self.clases:
 					yIn.append(reduce(lambda x, y: x + y, [x * b for (x, b) in zip(self.neuronasEntrada, self.pesosByNeuronaSalida[clase])]))
 
+				"""
 				for i in range(0, self.nClases):
 					if yIn[i] > self.umbral:
 						yIn[i] = 1
@@ -67,20 +75,32 @@ class Perceptron(Clasificador):
 						yIn[i] = -1
 					else:
 						yIn[i] = 0
+				"""
 
 				vectorObjetivo = vectoresObjetivos[instancia]
 				
 				for j in range(0, self.nClases):
-					if yIn[j] != vectorObjetivo[j]:
-						#hago cosas
-						flagPesos = True
-						auxDeltaPesos = self.alpha * vectorObjetivo[j]
-						for indNE in range(0, self.nColumnas + 1):
-							self.pesosByNeuronaSalida[self.clases[j]][indNE] += (auxDeltaPesos * self.neuronasEntrada[indNE])
+					diferencia = (vectorObjetivo[j] - yIn[j])
+					self.errorCuadraticoMedio += pow(diferencia, 2)
+					auxDeltaPesos = self.alpha * diferencia
+					for indNE in range(0, self.nColumnas + 1):
+						self.pesosByNeuronaSalida[self.clases[j]][indNE] += (auxDeltaPesos * self.neuronasEntrada[indNE])
 
+			#calculo del error cuadratico medio de la época
+			self.errorCuadraticoMedio = self.errorCuadraticoMedio/float(self.nInstaces)
+			if self.debug == True:
+				self.debugFile.write(str(epoca) + '\t' + str(self.errorCuadraticoMedio) + '\n')
+				difErrCuadratico = abs((self.errorCuadraticoMedio - self.errorCuadraticoMedio_old)/self.errorCuadraticoMedio_old)
+				
+				if difErrCuadratico < 0.00000001:
+					return
 
-			if flagPesos == False:
-				break
+				self.errorCuadraticoMedio_old = self.errorCuadraticoMedio
+			else:
+				difErrCuadratico = (self.errorCuadraticoMedio - self.errorCuadraticoMedio_old)/self.errorCuadraticoMedio_old
+				if difErrCuadratico < 0.00000001:
+					return
+
 		
 
 	#private
@@ -104,16 +124,8 @@ class Perceptron(Clasificador):
 		for clase in self.clases:
 			yIn.append(reduce(lambda x, y: x + y, [x * b for (x, b) in zip(self.neuronasEntrada, self.pesosByNeuronaSalida[clase])]))
 
+
 		
-		for i in range(0, self.nClases):
-			if yIn[i] > self.umbral:
-				yIn[i] = 1
-			elif yIn[i] < -self.umbral:
-				yIn[i] = -1
-			else:
-				yIn[i] = 0
-
-
 		mejorClase = None
 		mejorProb = -100.0
 		for i in range(0, self.nClases):
@@ -122,7 +134,6 @@ class Perceptron(Clasificador):
 				mejorProb = yIn[i]
 
 		return mejorClase
-
 
 	"""retorna un String JSON para que el Clasificador se pueda guardar en un fichero o donde sea necesario"""
 	def saveClassifierToJSON(self):
@@ -135,4 +146,9 @@ class Perceptron(Clasificador):
 	def getCapabilities(self):
 		raise NotImplementedError( "Should have implemented this" )
 	
+	"""Hace que el clasificador entre en modo debug o no"""
+	def setDebug(self, value):
+		self.debug = value
+		if self.debug == True:
+			self.debugFile = open(self.debugFileName, 'w')
 		

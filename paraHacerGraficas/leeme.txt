@@ -1,0 +1,7 @@
+hay dos carpetas:
+Adaline con limite tiene el limite propuesto por el profesor con respecto al error cuadratico medio
+	Se puede ver como se para la ejecución antes de llegar al limite de epocas, muy útil
+
+Sin limite es para enseñar unas graficas sobre como afecta alpha o alfa a la convergencia del error cuadratico medio. muy bonito, lo he puesto en excel feo y mola.
+
+los datos se han sacado con problema real 1 que es el que me ha gustado.
