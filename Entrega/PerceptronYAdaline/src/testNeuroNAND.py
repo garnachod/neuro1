@@ -2,10 +2,8 @@
 import os, sys
 lib_path = os.path.abspath('../')
 sys.path.append(lib_path)
-from Clasificadores.NaiveBayes import NaiveBayes
 from Clasificadores.Perceptron import Perceptron
 from Clasificadores.Adaline import Adaline
-from Clasificadores.RedNeuronal import RedNeuronal
 from Particionado.DivisionPorcentual import DivisionPorcentual
 from Particionado.Particion import Particion
 from RW.LectorNeuro import LectorNeuro
@@ -41,7 +39,7 @@ def calculaError(clasificador, instances):
 """pruebas unitarias"""
 if __name__ == '__main__':
 	lector = LectorNeuro()
-	instances = lector.leerFichero('../data/and.txt');
+	instances = lector.leerFichero('../data/nand.txt');
 	
 	porcentajeParticionado = 1.0
 	particionado = DivisionPorcentual()

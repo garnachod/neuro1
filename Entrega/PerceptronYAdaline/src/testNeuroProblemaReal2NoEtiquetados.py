@@ -2,10 +2,8 @@
 import os, sys
 lib_path = os.path.abspath('../')
 sys.path.append(lib_path)
-from Clasificadores.NaiveBayes import NaiveBayes
 from Clasificadores.Perceptron import Perceptron
 from Clasificadores.Adaline import Adaline
-from Clasificadores.RedNeuronal import RedNeuronal
 from Particionado.DivisionPorcentual import DivisionPorcentual
 from Particionado.Particion import Particion
 from RW.LectorNeuro import LectorNeuro
@@ -41,9 +39,12 @@ def calculaError(clasificador, instances):
 """pruebas unitarias"""
 if __name__ == '__main__':
 	lector = LectorNeuro()
-	instances = lector.leerFichero('../data/and.txt');
+	instances = lector.leerFichero('../data/problema_real2.txt');
+	instancesSin = lector.leerFichero('../data/problema_real2_no_etiquetados.txt');
+	fPerceptron = open('../data/predicciones_perceptron.txt', 'w')
+	fAdaline= open('../data/predicciones_adaline.txt', 'w')
 	
-	porcentajeParticionado = 1.0
+	porcentajeParticionado = 0.7
 	particionado = DivisionPorcentual()
 	particionado.setPortcentajeTrain(porcentajeParticionado)
 	particion = particionado.generaParticionesProporcional(instances)
@@ -57,6 +58,12 @@ if __name__ == '__main__':
 	if porcentajeParticionado != 1.0:
 		print "Error TEST:"
 		calculaError(clasificador, particion.getTest())
+
+	print "Clasificanción con Adaline"
+	for instance in instancesSin.getListInstances():
+		clase = clasificador.classifyInstance(instance)
+		fAdaline.write(clase + '\n')
+
 	
 	print "Perceptron"
 	clasificador = Perceptron()
@@ -67,6 +74,11 @@ if __name__ == '__main__':
 	if porcentajeParticionado != 1.0:
 		print "Error TEST:"
 		calculaError(clasificador, particion.getTest())
+
+	print "Clasificanción con Perceptrón"
+	for instance in instancesSin.getListInstances():
+		clase = clasificador.classifyInstance(instance)
+		fPerceptron.write(clase + '\n')
 
 	#print clasificador.classifyInstance(instances.getListInstances()[4])
 	#print (instances.getListInstances()[4]).getClase()

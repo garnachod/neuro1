@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from MachineLearning.Instance import Instance
-from MachineLearning.Instances import Instances
+from src.Instance import Instance
+from src.Instances import Instances
 from Clasificador import Clasificador
 import random
 import math
@@ -83,6 +83,7 @@ class Adaline(Clasificador):
 				difErrCuadratico = abs((self.errorCuadraticoMedio - self.errorCuadraticoMedio_old)/self.errorCuadraticoMedio_old)
 				
 				if difErrCuadratico < 0.00000001:
+					print "# época:", epoca
 					return
 
 				self.errorCuadraticoMedio_old = self.errorCuadraticoMedio
@@ -90,6 +91,9 @@ class Adaline(Clasificador):
 				difErrCuadratico = abs((self.errorCuadraticoMedio - self.errorCuadraticoMedio_old)/self.errorCuadraticoMedio_old)
 				if difErrCuadratico < 0.00000001:
 					return
+					
+		if self.debug:
+			print "# época:", epoca
 
 		
 
