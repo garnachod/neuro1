@@ -1,0 +1,1 @@
+Caso general. Comprueba ascendete, descendente, detención (dos veces el mismo impulso) y el cambio de unos a otros

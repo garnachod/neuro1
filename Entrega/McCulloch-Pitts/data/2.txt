@@ -1,0 +1,1 @@
+Prueba una secuencia descendente continua. Sirve para probar la detección descendente y para comprobar que esta sea circular.
